@@ -1,0 +1,244 @@
+/* ---------- 상단 점수 ---------- */
+.total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 22px 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.total-label { font-size: 1.05rem; opacity: .75; }
+#totalScore { font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1; font-variant-numeric: tabular-nums; }
+#totalScore::after { content: "점"; font-size: 1.1rem; margin-left: 2px; opacity: .75; }
+
+/* ---------- 본문 ---------- */
+.board-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hint {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.board-card {
+  background:
+    radial-gradient(120% 90% at 10% 0%, #FFFDF8 0%, #FBF5EA 60%, #F5EBDA 100%);
+  border: 2px solid var(--line);
+  border-radius: 32px;
+  padding: clamp(8px, 2vw, 22px);
+  box-shadow: 0 14px 40px rgba(60, 45, 20, .10);
+}
+
+.board {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 물줄기 */
+.river-bank { fill: none; stroke: #BFDCE0; stroke-linecap: round; stroke-linejoin: round; }
+.river-water { fill: none; stroke: #8CC5CF; stroke-linecap: round; stroke-linejoin: round; }
+.river-shine { fill: none; stroke: #EAF6F7; stroke-linecap: round; stroke-dasharray: 26 38; opacity: .9; }
+.flow-arrow { fill: #5FA6B3; }
+.river-label { font-size: 30px; font-weight: 900; fill: #3D8795; }
+
+/* 칸 */
+.slot { cursor: pointer; outline: none; }
+.slot-shadow { fill: #D8CDB8; }
+.slot-box {
+  fill: #FFFFFF;
+  stroke: #CBBFA8;
+  stroke-width: 3;
+  transition: fill .2s, stroke .2s;
+}
+.slot-order { font-size: 22px; font-weight: 700; fill: #A39985; }
+.slot-value {
+  font-size: 68px;
+  font-weight: 900;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
+}
+.slot-value.is-joker { fill: var(--joker); font-size: 64px; }
+.slot.is-empty .slot-box { fill: #FFFDF8; stroke-dasharray: 10 8; }
+.slot:hover .slot-box { stroke: var(--accent); }
+.slot.is-selected .slot-box,
+.slot:focus-visible .slot-box { stroke: var(--accent); stroke-width: 7; stroke-dasharray: none; }
+.slot.is-selected .slot-shadow { fill: var(--accent); }
+
+.slot.run-0 .slot-box { fill: #D5EFE7; stroke: #6DB7A3; }
+.slot.run-1 .slot-box { fill: #FDE7C8; stroke: #E0A860; }
+.slot.run-2 .slot-box { fill: #DDE5FA; stroke: #8199DB; }
+.slot.run-3 .slot-box { fill: #F9DCE4; stroke: #D98AA0; }
+
+.run-badge rect { fill: var(--ink); }
+.run-badge text { font-size: 24px; font-weight: 900; fill: #fff; }
+
+/* ---------- 점수 내역 ---------- */
+.summary {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  padding: 18px 22px;
+}
+.summary h2 { margin: 0 0 10px; font-size: 1.25rem; font-weight: 900; }
+.run-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.run-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.run-list li strong { font-size: 1.35rem; font-weight: 900; }
+.run-list li.run-0 { background: #D5EFE7; border-color: #6DB7A3; }
+.run-list li.run-1 { background: #FDE7C8; border-color: #E0A860; }
+.run-list li.run-2 { background: #DDE5FA; border-color: #8199DB; }
+.run-list li.run-3 { background: #F9DCE4; border-color: #D98AA0; }
+.run-list li.empty { color: var(--ink-soft); padding-left: 0; }
+.rule-note { margin: 12px 0 0; font-size: 1rem; color: var(--ink-soft); }
+
+.board-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.board-actions .new-game { border-top: 0; padding-top: 0; }
+@media (max-width: 520px) {
+  .board-actions { grid-template-columns: 1fr; }
+}
+
+.print-scores { display: none; }
+
+/* ---------- 숫자 고르기 판 ---------- */
+.sheet { position: fixed; inset: 0; z-index: 20; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(27, 37, 48, .45); }
+.sheet-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(100%, 720px);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--panel);
+  border-radius: 28px 28px 0 0;
+  padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, .2);
+  animation: sheet-up .22s ease-out;
+}
+@keyframes sheet-up { from { transform: translate(-50%, 30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sheet-panel { animation: none; } }
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.sheet-head h2 { margin: 0; font-size: 1.5rem; font-weight: 900; }
+.sheet-close {
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  background: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.use-drawn {
+  width: 100%;
+  min-height: 76px;
+  margin-bottom: 14px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  box-shadow: 0 5px 0 var(--accent-press);
+}
+.use-drawn strong { font-size: 2rem; font-weight: 900; margin: 0 4px; vertical-align: -2px; }
+.use-drawn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--accent-press); }
+
+.pad {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+@media (min-width: 600px) { .pad { grid-template-columns: repeat(8, 1fr); } }
+
+.pad button {
+  min-height: 62px;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  background: #fff;
+  font-size: 1.6rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.pad button:active:not(:disabled) { background: var(--accent-soft); border-color: var(--accent); }
+.pad button.is-current { background: var(--accent-soft); border-color: var(--accent); }
+.pad button.is-joker { color: var(--joker); }
+.pad button:disabled { opacity: .25; cursor: default; }
+
+.clear-slot {
+  width: 100%;
+  min-height: 60px;
+  margin-top: 14px;
+  border-radius: 14px;
+  border: 2px solid #EDB8B1;
+  background: #FDECEA;
+  color: var(--danger);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/* ---------- 인쇄 ---------- */
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  body { background: #fff; padding: 0; font-size: 12pt; }
+  .tabs, .hint, .summary, .board-actions, .sheet { display: none !important; }
+  .top { margin-bottom: 6mm; }
+  .total { background: none; color: var(--ink); border: 2px solid var(--ink); }
+  .board-card { box-shadow: none; background: #fff; border-color: #999; padding: 4mm; break-inside: avoid; }
+  .river-bank { stroke: #D6E9EC; }
+  .river-water { stroke: #BFE0E6; }
+  .river-shine { display: none; }
+  .print-scores {
+    display: table;
+    width: 100%;
+    margin-top: 6mm;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 11pt;
+  }
+  .print-scores td { border: 1px solid #999; padding: 2mm 1mm; }
+  .print-scores tr:first-child td { font-weight: 700; background: #F4F4F4; }
+}

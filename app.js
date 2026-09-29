@@ -85,16 +85,44 @@ if ('speechSynthesis' in window) {
   speechSynthesis.addEventListener?.('voiceschanged', pickVoice);
 }
 
-function speak(value) {
-  if (!state.voice || !('speechSynthesis' in window) || value == null) return;
-  speechSynthesis.cancel();
-  const text = value === JOKER ? '조커! 원하는 숫자를 쓰세요.' : `${value}. ${value}.`;
+const REPEAT_GAP_MS = 1600; // 두 번 읽을 때 사이 쉬는 시간
+let repeatTimer = null;
+let speechId = 0; // 멈추거나 새로 읽으면 바뀌어서, 이전 읽기의 두 번째 읽기를 막는다
+
+function stopSpeaking() {
+  speechId++;
+  clearTimeout(repeatTimer);
+  repeatTimer = null;
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+
+function utter(text, onend) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'ko-KR';
   if (koVoice) u.voice = koVoice;
   u.rate = 0.8;
   u.pitch = 1;
+  if (onend) u.onend = onend;
   speechSynthesis.speak(u);
+}
+
+function speak(value) {
+  if (!state.voice || !('speechSynthesis' in window) || value == null) return;
+  stopSpeaking();
+  if (value === JOKER) {
+    utter('조커! 원하는 숫자를 쓰세요.');
+    return;
+  }
+  // 한 번 읽고, 다 읽은 뒤 잠깐 쉬었다가 한 번 더 읽는다.
+  const text = String(value);
+  const id = speechId;
+  utter(text, () => {
+    if (id !== speechId) return;
+    repeatTimer = setTimeout(() => {
+      repeatTimer = null;
+      if (state.voice) utter(text);
+    }, REPEAT_GAP_MS);
+  });
 }
 
 // ---------- 화면 켜짐 유지 ----------
@@ -219,12 +247,12 @@ function undo() {
   // 되돌린 타일은 주머니 맨 위로 돌아가므로, 다시 뽑으면 같은 숫자가 나온다.
   state.bag.push(state.drawn.pop());
   save();
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  stopSpeaking();
   render();
 }
 
 function newGame() {
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  stopSpeaking();
   state = freshGame(state.voice);
   save();
   hideConfirm();
@@ -249,7 +277,7 @@ els.speakBtn.addEventListener('click', () => speak(state.drawn[state.drawn.lengt
 els.undoBtn.addEventListener('click', undo);
 els.voiceBtn.addEventListener('click', () => {
   state.voice = !state.voice;
-  if (!state.voice && 'speechSynthesis' in window) speechSynthesis.cancel();
+  if (!state.voice) stopSpeaking();
   save();
   render();
 });

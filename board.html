@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>스트림스 보드판</title>
+  <meta name="description" content="스트림스 보드게임 점수판 — 칸을 눌러 숫자를 쓰면 점수가 자동으로 계산됩니다">
+  <meta name="theme-color" content="#F4EEE2">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+  <nav class="tabs" aria-label="화면 이동">
+    <a href="./">숫자 뽑기</a>
+    <a href="board.html" aria-current="page">내 보드판</a>
+  </nav>
+
+  <header class="top">
+    <h1>스트림스 보드판</h1>
+    <div class="total" aria-live="polite">
+      <span class="total-label">점수</span>
+      <span id="totalScore">0</span>
+    </div>
+  </header>
+
+  <main class="board-page">
+    <p id="hint" class="hint">빈 칸을 눌러 숫자를 넣으세요</p>
+
+    <div class="board-card">
+      <svg id="board" class="board" role="group" aria-label="스트림스 보드판 20칸"></svg>
+    </div>
+
+    <section class="summary" aria-label="점수 내역">
+      <h2>이어진 물줄기</h2>
+      <ul id="runList" class="run-list"></ul>
+      <p class="rule-note">왼쪽 번호 순서대로 숫자가 같거나 커지면 이어집니다. ★조커는 어떤 숫자로도 쓸 수 있어요.</p>
+    </section>
+
+    <div class="board-actions">
+      <button id="printBtn" class="btn-tool" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6" fill="none"/><rect x="3" y="9" width="18" height="8" rx="2" fill="none"/><path d="M7 14h10v7H7z" fill="none"/></svg>
+        인쇄하기
+      </button>
+      <div class="new-game">
+        <button id="newBtn" class="btn-new" type="button">새 보드판</button>
+        <div id="confirmNew" class="confirm" hidden>
+          <p>적은 숫자를 모두 지울까요?</p>
+          <div class="confirm-row">
+            <button id="confirmYes" class="btn-yes" type="button">네, 지우기</button>
+            <button id="confirmNo" class="btn-no" type="button">아니요</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table class="print-scores" aria-hidden="true">
+      <tbody id="printScoreBody"></tbody>
+    </table>
+  </main>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-head">
+        <h2 id="sheetTitle">1번 칸</h2>
+        <button class="sheet-close" type="button" data-close aria-label="닫기">닫기</button>
+      </div>
+      <button id="useDrawn" class="use-drawn" type="button" hidden>
+        방금 뽑은 숫자 <strong id="drawnValue"></strong> 넣기
+      </button>
+      <div id="pad" class="pad"></div>
+      <button id="clearSlot" class="clear-slot" type="button" hidden>이 칸 지우기</button>
+    </div>
+  </div>
+
+  <script src="board.js"></script>
+</body>
+</html>
