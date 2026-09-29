@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>스트림스 숫자 뽑기</title>
+  <meta name="description" content="스트림스 보드게임 숫자 타일을 대신 뽑아주는 큰 글씨 웹앱">
+  <meta name="theme-color" content="#F4EEE2">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>스트림스 숫자 뽑기</h1>
+    <div class="round" aria-label="진행 상황">
+      <span id="roundNow">0</span><span class="round-of">/ 20</span>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="draw" aria-label="숫자 뽑기">
+      <div id="tile" class="tile is-empty" role="status" aria-live="assertive">
+        <span id="tileValue">?</span>
+      </div>
+      <p id="caption" class="caption">아래 버튼을 눌러 첫 숫자를 뽑으세요</p>
+
+      <button id="drawBtn" class="btn-draw" type="button">숫자 뽑기</button>
+
+      <div class="tools">
+        <button id="speakBtn" class="btn-tool" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none"/></svg>
+          다시 듣기
+        </button>
+        <button id="undoBtn" class="btn-tool" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5" fill="none"/><path d="M4 9h10a6 6 0 0 1 0 12h-3" fill="none"/></svg>
+          되돌리기
+        </button>
+        <button id="voiceBtn" class="btn-tool" type="button" aria-pressed="true">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="voiceLabel">소리 켜짐</span>
+        </button>
+      </div>
+    </section>
+
+    <aside class="side" aria-label="뽑은 숫자 기록">
+      <div class="prev">
+        <span class="prev-label">바로 전 숫자</span>
+        <strong id="prevValue" class="prev-value">–</strong>
+      </div>
+
+      <h2>나온 순서</h2>
+      <ol id="slots" class="slots"></ol>
+
+      <details class="score">
+        <summary>점수 계산표 보기</summary>
+        <table>
+          <thead><tr><th>이어진 칸</th><th>점수</th><th>이어진 칸</th><th>점수</th></tr></thead>
+          <tbody id="scoreBody"></tbody>
+        </table>
+      </details>
+
+      <div class="new-game">
+        <button id="newBtn" class="btn-new" type="button">새 게임 시작</button>
+        <div id="confirmNew" class="confirm" hidden>
+          <p>지금 게임을 지우고 새로 시작할까요?</p>
+          <div class="confirm-row">
+            <button id="confirmYes" class="btn-yes" type="button">네, 새로 시작</button>
+            <button id="confirmNo" class="btn-no" type="button">아니요</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
