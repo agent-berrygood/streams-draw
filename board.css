@@ -225,16 +225,25 @@
   @page { size: A4 landscape; margin: 12mm; }
   body { background: #fff; padding: 0; font-size: 12pt; }
   .tabs, .hint, .summary, .board-actions, .sheet { display: none !important; }
-  .top { margin-bottom: 6mm; }
-  .total { background: none; color: var(--ink); border: 2px solid var(--ink); }
-  .board-card { box-shadow: none; background: #fff; border-color: #999; padding: 4mm; break-inside: avoid; }
+  .top { margin: 0 0 4mm; }
+  .top h1 { font-size: 18pt; }
+  .total { background: none; color: var(--ink); border: 2px solid var(--ink); padding: 1mm 5mm; }
+  #totalScore { font-size: 18pt; }
+  .board-page { gap: 0; }
+  /* A4 가로 한 장(273×186mm 인쇄 영역)에 제목·보드판·점수표가 함께 들어가도록 높이를 정한다 */
+  .board-card {
+    box-shadow: none; background: #fff; border-color: #999; border-radius: 6mm;
+    padding: 3mm; break-inside: avoid;
+  }
+  .board { width: auto; height: 132mm; max-width: 100%; margin: 0 auto; }
   .river-bank { stroke: #D6E9EC; }
   .river-water { stroke: #BFE0E6; }
   .river-shine { display: none; }
   .print-scores {
     display: table;
     width: 100%;
-    margin-top: 6mm;
+    margin-top: 4mm;
+    break-inside: avoid;
     border-collapse: collapse;
     text-align: center;
     font-size: 11pt;

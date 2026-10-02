@@ -106,8 +106,10 @@ function svg(tag, attrs = {}, parent) {
   return el;
 }
 
+let printing = false; // 인쇄할 때는 화면 크기와 상관없이 가로 5칸 배치
+
 function geometry() {
-  const cols = narrowQuery.matches ? 4 : 5;
+  const cols = narrowQuery.matches && !printing ? 4 : 5;
   const rows = SLOTS / cols;
   const pos = [];
   for (let i = 0; i < SLOTS; i++) {
@@ -366,6 +368,8 @@ els.confirmYes.addEventListener('click', () => {
 });
 
 narrowQuery.addEventListener('change', render);
+window.addEventListener('beforeprint', () => { printing = true; render(); });
+window.addEventListener('afterprint', () => { printing = false; render(); });
 // 다른 탭에서 숫자를 뽑거나 보드를 바꾸면 따라간다
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY) { values = load(); render(); }
