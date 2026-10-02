@@ -122,18 +122,41 @@
 .run-list li.empty { color: var(--ink-soft); padding-left: 0; }
 .rule-note { margin: 12px 0 0; font-size: 1rem; color: var(--ink-soft); }
 
-.board-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
-}
 .board-actions .new-game { border-top: 0; padding-top: 0; }
-@media (max-width: 520px) {
-  .board-actions { grid-template-columns: 1fr; }
-}
 
-.print-scores { display: none; }
+/* ---------- 인쇄 선택 ---------- */
+.print-box {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  padding: 18px 22px;
+}
+.print-box h2 { margin: 0 0 12px; font-size: 1.25rem; font-weight: 900; }
+.print-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 520px) { .print-choices { grid-template-columns: 1fr; } }
+.print-choice {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  padding: 10px;
+}
+.print-choice strong { font-size: 1.3rem; font-weight: 900; }
+.print-choice span { font-size: 1rem; color: var(--ink-soft); font-weight: 700; }
+.print-choice:active { background: #EFE7D7; }
+.print-note { margin: 12px 0 0; font-size: 1rem; color: var(--ink-soft); }
+.print-note b { color: var(--ink); }
+
+.print-sheets { display: none; }
 
 /* ---------- 숫자 고르기 판 ---------- */
 .sheet { position: fixed; inset: 0; z-index: 20; }
@@ -224,13 +247,33 @@
 @media print {
   @page { size: A4 landscape; margin: 12mm; }
   body { background: #fff; padding: 0; font-size: 12pt; }
-  .tabs, .hint, .summary, .board-actions, .sheet { display: none !important; }
-  .top { margin: 0 0 4mm; }
-  .top h1 { font-size: 18pt; }
-  .total { background: none; color: var(--ink); border: 2px solid var(--ink); padding: 1mm 5mm; }
-  #totalScore { font-size: 18pt; }
-  .board-page { gap: 0; }
+  .tabs, .top, .board-page, .sheet { display: none !important; }
+
+  .print-sheets { display: block; }
+  body[data-print="single"] .print-sheet:nth-child(n + 2) { display: none; }
+  .print-sheet { break-after: page; }
+  .print-sheet:last-child,
+  body[data-print="single"] .print-sheet:first-child { break-after: auto; }
+
   /* A4 가로 한 장(273×186mm 인쇄 영역)에 제목·보드판·점수표가 함께 들어가도록 높이를 정한다 */
+  .print-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4mm;
+  }
+  .print-head h2 { margin: 0; font-size: 18pt; font-weight: 900; }
+  .game-no {
+    margin-left: 3mm;
+    padding: 0.5mm 4mm;
+    border: 2px solid var(--ink);
+    border-radius: 99px;
+    font-size: 13pt;
+  }
+  .fill-in { display: flex; align-items: flex-end; gap: 3mm; font-size: 13pt; font-weight: 700; }
+  .fill-in i { width: 45mm; height: 8mm; border-bottom: 2px solid var(--ink); }
+  .fill-in i.short { width: 25mm; }
+
   .board-card {
     box-shadow: none; background: #fff; border-color: #999; border-radius: 6mm;
     padding: 3mm; break-inside: avoid;
@@ -239,8 +282,8 @@
   .river-bank { stroke: #D6E9EC; }
   .river-water { stroke: #BFE0E6; }
   .river-shine { display: none; }
+
   .print-scores {
-    display: table;
     width: 100%;
     margin-top: 4mm;
     break-inside: avoid;

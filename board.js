@@ -24,12 +24,13 @@ const els = {
   useDrawn: $('useDrawn'),
   drawnValue: $('drawnValue'),
   clearSlot: $('clearSlot'),
-  printBtn: $('printBtn'),
   newBtn: $('newBtn'),
   confirmNew: $('confirmNew'),
   confirmYes: $('confirmYes'),
   confirmNo: $('confirmNo'),
-  printScoreBody: $('printScoreBody'),
+  printSheets: $('printSheets'),
+  printSingle: $('printSingle'),
+  printDouble: $('printDouble'),
 };
 
 const narrowQuery = window.matchMedia('(max-width: 700px)');
@@ -106,10 +107,7 @@ function svg(tag, attrs = {}, parent) {
   return el;
 }
 
-let printing = false; // 인쇄할 때는 화면 크기와 상관없이 가로 5칸 배치
-
-function geometry() {
-  const cols = narrowQuery.matches && !printing ? 4 : 5;
+function geometry(cols) {
   const rows = SLOTS / cols;
   const pos = [];
   for (let i = 0; i < SLOTS; i++) {
@@ -154,9 +152,9 @@ function arrow(parent, x, y, dir) {
   svg('polygon', { points: pts, class: 'flow-arrow' }, parent);
 }
 
-function renderBoard(runs) {
-  const g = geometry();
-  const b = els.board;
+// target SVG에 보드판을 그린다. interactive가 false면 인쇄용(누를 수 없는 칸)이다.
+function drawBoard(b, { vals, runs = [], cols = 5, sel = null, interactive = true }) {
+  const g = geometry(cols);
   b.replaceChildren();
   b.setAttribute('viewBox', `0 0 ${g.width} ${g.height}`);
 
@@ -198,20 +196,20 @@ function renderBoard(runs) {
   }
 
   g.pos.forEach((p, i) => {
-    const v = values[i];
+    const v = vals[i];
     const run = runOf[i];
     const cls = ['slot'];
     if (v == null) cls.push('is-empty');
     if (run) cls.push(`run-${run.color}`);
-    if (selected === i) cls.push('is-selected');
+    if (sel === i) cls.push('is-selected');
 
-    const slot = svg('g', {
+    const slot = svg('g', interactive ? {
       class: cls.join(' '),
       role: 'button',
       tabindex: 0,
       'data-index': i,
       'aria-label': `${i + 1}번 칸, ${v == null ? '비어 있음' : v === JOKER ? '조커' : v}`,
-    }, b);
+    } : { class: cls.join(' ') }, b);
     const x0 = p.x - BOX / 2, y0 = p.y - BOX / 2;
     svg('rect', { x: x0, y: y0 + 7, width: BOX, height: BOX, rx: 28, class: 'slot-shadow' }, slot);
     svg('rect', { x: x0, y: y0, width: BOX, height: BOX, rx: 28, class: 'slot-box' }, slot);
@@ -248,7 +246,7 @@ function render() {
       ? '빈 칸을 눌러 숫자를 넣으세요'
       : `빈 칸을 눌러 숫자를 넣으세요 · ${SLOTS - filled}칸 남음`;
 
-  renderBoard(runs);
+  drawBoard(els.board, { vals: values, runs, cols: narrowQuery.matches ? 4 : 5, sel: selected });
 
   const scoring = runs.filter((r) => r.len >= 2);
   els.runList.innerHTML = scoring.length
@@ -314,11 +312,29 @@ function place(v) {
   closeSheet();
 }
 
-// ---------- 인쇄용 점수표 ----------
-function buildPrintScores() {
+// ---------- 인쇄용 보드판 ----------
+// 종이에 쓰는 빈 보드판. 1게임·2게임 두 장을 만들어 두고, 단면 인쇄는 1게임만 보인다.
+function buildPrintSheets() {
   const head = Array.from({ length: SLOTS }, (_, i) => `<td>${i + 1}칸</td>`).join('');
   const body = SCORES.map((s) => `<td>${s}</td>`).join('');
-  els.printScoreBody.innerHTML = `<tr><td>이어진 칸</td>${head}</tr><tr><td>점수</td>${body}</tr>`;
+  els.printSheets.innerHTML = [1, 2].map((game) => `
+    <section class="print-sheet">
+      <header class="print-head">
+        <h2>스트림스 보드판 <span class="game-no">${game}게임</span></h2>
+        <div class="fill-in"><span>이름</span><i></i><span>점수</span><i class="short"></i></div>
+      </header>
+      <div class="board-card"><svg class="board" aria-hidden="true"></svg></div>
+      <table class="print-scores">
+        <tr><td>이어진 칸</td>${head}</tr><tr><td>점수</td>${body}</tr>
+      </table>
+    </section>`).join('');
+  els.printSheets.querySelectorAll('svg').forEach((b) =>
+    drawBoard(b, { vals: Array(SLOTS).fill(null), interactive: false }));
+}
+
+function printSheets(mode) {
+  document.body.dataset.print = mode; // 'single' | 'double'
+  window.print();
 }
 
 // ---------- 이벤트 ----------
@@ -347,7 +363,9 @@ els.clearSlot.addEventListener('click', () => place(null));
 els.sheet.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeSheet(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
-els.printBtn.addEventListener('click', () => window.print());
+els.printSingle.addEventListener('click', () => printSheets('single'));
+els.printDouble.addEventListener('click', () => printSheets('double'));
+window.addEventListener('afterprint', () => { delete document.body.dataset.print; });
 
 els.newBtn.addEventListener('click', () => {
   if (values.every((v) => v == null)) return;
@@ -368,13 +386,11 @@ els.confirmYes.addEventListener('click', () => {
 });
 
 narrowQuery.addEventListener('change', render);
-window.addEventListener('beforeprint', () => { printing = true; render(); });
-window.addEventListener('afterprint', () => { printing = false; render(); });
 // 다른 탭에서 숫자를 뽑거나 보드를 바꾸면 따라간다
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY) { values = load(); render(); }
 });
 
 buildPad();
-buildPrintScores();
+buildPrintSheets();
 render();

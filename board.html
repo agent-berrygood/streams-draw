@@ -40,11 +40,22 @@
       <p class="rule-note">왼쪽 번호 순서대로 숫자가 같거나 커지면 이어집니다. ★조커는 어떤 숫자로도 쓸 수 있어요.</p>
     </section>
 
+    <section class="print-box" aria-labelledby="printTitle">
+      <h2 id="printTitle">종이 보드판 인쇄</h2>
+      <div class="print-choices">
+        <button id="printSingle" class="print-choice" type="button">
+          <strong>단면 인쇄</strong>
+          <span>1게임 · 종이 1쪽</span>
+        </button>
+        <button id="printDouble" class="print-choice" type="button">
+          <strong>양면 인쇄</strong>
+          <span>1게임 + 2게임 · 앞뒤 2쪽</span>
+        </button>
+      </div>
+      <p class="print-note">양면 인쇄는 인쇄 창에서 <b>양면 인쇄</b>와 <b>짧은 가장자리로 넘기기</b>를 골라 주세요. 빈 보드판이 인쇄돼요.</p>
+    </section>
+
     <div class="board-actions">
-      <button id="printBtn" class="btn-tool" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6" fill="none"/><rect x="3" y="9" width="18" height="8" rx="2" fill="none"/><path d="M7 14h10v7H7z" fill="none"/></svg>
-        인쇄하기
-      </button>
       <div class="new-game">
         <button id="newBtn" class="btn-new" type="button">새 보드판</button>
         <div id="confirmNew" class="confirm" hidden>
@@ -57,10 +68,9 @@
       </div>
     </div>
 
-    <table class="print-scores" aria-hidden="true">
-      <tbody id="printScoreBody"></tbody>
-    </table>
   </main>
+
+  <div id="printSheets" class="print-sheets" aria-hidden="true"></div>
 
   <div id="sheet" class="sheet" hidden>
     <div class="sheet-backdrop" data-close></div>
